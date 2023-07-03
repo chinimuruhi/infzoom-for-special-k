@@ -1,1 +1,1 @@
-https://github.com/kinetic-flow/infzoom
+https://github.com/chinimuruhi/infzoom-for-special-k
