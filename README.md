@@ -1,25 +1,18 @@
-# infzoom
+# infzoom for special k
 
-infzoom is a custom launcher for beatmania IIDX Infinitas.
+infzoom for special k is a custom launcher for beatmania IIDX Infinitas.
+
+When running with [Special K](https://github.com/SpecialKO), ability to pan and zoom in/out with 120FPS windowed or borderless fullscreen is available.
 
 ## Disclaimers
 
-infzoom is based on [darekasan/inf_launch_ext](https://github.com/darekasan/inf_launch_ext).
+infzoom for special k is based on [kinetic-flow/infzoom](https://github.com/kinetic-flow/infzoom).
 
-infzoom will use functionalities built into Windows to change window decorations and resize the game window. None of this is invasive; it's very unlikely that any of this would be considered a violation of Terms of Service / EULA of Infinitas. It explicitly **does not** hook into DirectX or inject any code into the game or its runtime dependencies.
-
-At a high level, this tool does the following: modify the registry to intercept the bm2dxinf:// protocol used for launching the game, use Win32 API SetWindowPos to resize the game window, consume raw keyboard input from Win32 for handling global hotkeys. That's it.
-
-That being said, contributors of this project (or the fork this project is based on) are **not** responsible for any consequences of using this project, which can include (but not limited to) getting banned from the game service.
+Contributors of this project (or the fork this project is based on) are **not** responsible for any consequences of using this project, which can include (but not limited to) getting banned from the game service.
 
 Use at your own risk.
 
-> **Warning**
-> When running in windowed or borderless fullscreen mode, the game will lock to 60FPS. This is very unfortunate but the game seems to be doing this intentionally.
-
 ## Features
-
-[Click here for video demo](https://www.youtube.com/watch?v=Nb6E8KtnKzw)
 
 The launcher provides the following options:
 
@@ -106,11 +99,14 @@ Please select option.
 4 : ASIO + window mode (60Hz only)
 5 : WASAPI + fullscreen borderless (60Hz only) with zoom
 6 : ASIO + fullscreen borderless (60Hz only) with zoom
+7 : WASAPI + zoom (required Special K)
+8 : ASIO + zoom (required Special K)
 number(press enter for option 0):
 ```
 
 > **Warning**
 > As noted above, when running in windowed or borderless fullscreen mode, the game will lock to 60FPS. This is very unfortunate but the game seems to be doing this intentionally.
+> When running with [Special K](https://github.com/SpecialKO), ability to pan and zoom in/out with 120FPS windowed or borderless fullscreen is available.
 
 ### 0 : Launcher
 
@@ -153,6 +149,19 @@ The default hotkeys are:
 ### 6 : ASIO + fullscreen borderless (60Hz only) with zoom
 
 Same as #5, but with ASIO audio.
+
+### 7 : WASAPI + zoom (required Special K)
+Launch the game with WASAPI. It also runs infzoom.exe which is same as #5.
+
+Use [Special K](https://github.com/SpecialKO) to launch the game in a borderless window at 120FPS.
+
+Please disable Special K before starting Infinitas.
+After a splash screen is displayed, please enable special K and set to 120FPS and borderless window.
+After the setting is changed, infzoom will be available.
+
+### 8 : ASIO + zoom (required Special K)
+
+Same as #7, but with ASIO audio.
 
 ## Troubleshooting
 
