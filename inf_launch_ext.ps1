@@ -247,13 +247,16 @@ echo "3 : ASIO"
 echo "4 : ASIO + window mode (60Hz only)"
 echo "5 : WASAPI + fullscreen borderless (60Hz only) with zoom"
 echo "6 : ASIO + fullscreen borderless (60Hz only) with zoom"
+echo "7 : WASAPI + zoom (required Special K)"
+echo "8 : ASIO + zoom (required Special K)"
 
 $num = Read-Host "number (press enter for option $($Config["Option"]))"
 if([string]::IsNullOrEmpty($num)){
     $num=$Config["Option"]
 }
 
-$FullScreenBorderlessWithZoom = $false
+$WithZoom = $false
+$RequiredSpecialK = $false
 switch ($num) {
     0 {
         Start-Process -FilePath $InfLauncher -ArgumentList $Args[0]
@@ -274,12 +277,21 @@ switch ($num) {
     }
     5 {
         $InfArgs += " -w"
-        $FullScreenBorderlessWithZoom = $true
+        $WithZoom = $true
     }
     6 {
         $InfArgs += " -w"
         $InfArgs += " --asio"
-        $FullScreenBorderlessWithZoom = $true
+        $WithZoom = $true
+    }
+    7 {
+        $WithZoom = $true
+        $RequiredSpecialK = $true
+    }
+    8 {
+        $InfArgs += " --asio"
+        $WithZoom = $true
+        $RequiredSpecialK = $true
     }
     Default {
         exit
@@ -294,27 +306,73 @@ if ($ScriptIsUsta) {
 $Config["Option"] = [string]$num
 Save-Config
 
+# wait start INFINITAS
+if ($RequiredSpecialK) { 
+    echo 'Please disable Special K before starting Infinitas.'
+    echo 'After a splash screen is displayed, please enable Special K and set windowmode borderless.'
+    echo "Press any key to start Infinitas."
+    while($true){
+        if([Console]::KeyAvailable){
+            [Console]::ReadKey($true) >$null
+            break
+        }
+        Start-Sleep 1
+    }
+}
+
 # start INFINITAS
 $p = Start-Exe $InfExe "" $InfArgs
 
-# in window mode...
-if ($InfArgs.Contains("-w")){
-
+if ($WithZoom) {
     # wait for window creation
     $p.WaitForInputIdle() | Out-Null
     $handle = $p.MainWindowHandle
 
-    if ($FullScreenBorderlessWithZoom) {
-        # we let the separate EXE handle everything for this mode
-        $InfZoomExe = Join-Path $PSScriptRoot "infzoom.exe"
-        $infzoom_p = Start-Exe $InfZoomExe $PSScriptRoot $handle
-        $infzoom_p.WaitForExit() | Out-Null
-        Pause
+    # we let the separate EXE handle everything for this mode
+    $InfZoomExe = Join-Path $PSScriptRoot "infzoom.exe"
+    $infzoom_p = Start-Exe $InfZoomExe $PSScriptRoot $handle
+    $infzoom_p.WaitForExit() | Out-Null
+    Pause
+} elseif ($InfArgs.Contains("-w")){
+    # wait for window creation
+    $p.WaitForInputIdle() | Out-Null
+    $handle = $p.MainWindowHandle
 
-    } else {
+    # set to previous position and size
+    Switch-Borderless($Config["Borderless"])
+    [Win32Api]::MoveWindow2(
+        $handle,
+        $Config["WindowPositionX"],
+        $Config["WindowPositionY"],
+        $Config["WindowWidth"],
+        $Config["WindowHeight"],
+        $Config["Borderless"])
 
-        # set to previous position and size
+    echo ""
+    echo "window mode setting"
+    echo "example:"
+    echo "  window size -> type 1280x720"
+    echo "  window position -> type 100,100"
+    echo "Press enter key to switch to Borderless window, or use mouse cursor to resize window"
+
+    while($true){
+        $inputStr=Read-Host " "
+        if([string]::IsNullOrEmpty($inputStr)){
+            $Config["Borderless"] = (-Not $Config["Borderless"])
+        }elseif($inputStr.Contains("x")){
+            $val = $inputStr.Split('x')
+            $Config["WindowWidth"]=$val[0]
+            $Config["WindowHeight"]=$val[1]
+        }elseif($inputStr.Contains(",")){
+            $val = $inputStr.Split(',')
+            $Config["WindowPositionX"]=$val[0]
+            $Config["WindowPositionY"]=$val[1]
+        }
+
+        # make borderless
         Switch-Borderless($Config["Borderless"])
+
+        # Reflect position and size
         [Win32Api]::MoveWindow2(
             $handle,
             $Config["WindowPositionX"],
@@ -323,41 +381,8 @@ if ($InfArgs.Contains("-w")){
             $Config["WindowHeight"],
             $Config["Borderless"])
 
-        echo ""
-        echo "window mode setting"
-        echo "example:"
-        echo "  window size -> type 1280x720"
-        echo "  window position -> type 100,100"
-        echo "Press enter key to switch to Borderless window, or use mouse cursor to resize window"
-
-        while($true){
-            $inputStr=Read-Host " "
-            if([string]::IsNullOrEmpty($inputStr)){
-                $Config["Borderless"] = (-Not $Config["Borderless"])
-            }elseif($inputStr.Contains("x")){
-                $val = $inputStr.Split('x')
-                $Config["WindowWidth"]=$val[0]
-                $Config["WindowHeight"]=$val[1]
-            }elseif($inputStr.Contains(",")){
-                $val = $inputStr.Split(',')
-                $Config["WindowPositionX"]=$val[0]
-                $Config["WindowPositionY"]=$val[1]
-            }
-
-            # make borderless
-            Switch-Borderless($Config["Borderless"])
-
-            # Reflect position and size
-            [Win32Api]::MoveWindow2(
-                $handle,
-                $Config["WindowPositionX"],
-                $Config["WindowPositionY"],
-                $Config["WindowWidth"],
-                $Config["WindowHeight"],
-                $Config["Borderless"])
-
-            # write to config file
-            Save-Config
-        }
+        # write to config file
+        Save-Config
+    
     }
 }
