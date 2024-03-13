@@ -1,5 +1,5 @@
 # infzoom for special k
-The 2024 version of Infinitas is supported.
+INFINITAS 2024 is supported.
 infzoom for special k is a custom launcher for beatmania IIDX Infinitas.
 
 When running with [Special K](https://github.com/SpecialKO), ability to pan and zoom in/out with 120FPS windowed or borderless fullscreen is available.
