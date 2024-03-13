@@ -1,5 +1,5 @@
 # infzoom for special k
-
+The 2024 version of Infinitas is supported.
 infzoom for special k is a custom launcher for beatmania IIDX Infinitas.
 
 When running with [Special K](https://github.com/SpecialKO), ability to pan and zoom in/out with 120FPS windowed or borderless fullscreen is available.
@@ -99,8 +99,8 @@ Please select option.
 4 : ASIO + window mode (60Hz only)
 5 : WASAPI + fullscreen borderless (60Hz only) with zoom
 6 : ASIO + fullscreen borderless (60Hz only) with zoom
-7 : WASAPI + zoom (required Special K)
-8 : ASIO + zoom (required Special K)
+7 : WASAPI + zoom (Please eable Special K before starting Infinitas)
+8 : ASIO + zoom (Please eable Special K before starting Infinitas)
 number(press enter for option 0):
 ```
 
@@ -150,16 +150,14 @@ The default hotkeys are:
 
 Same as #5, but with ASIO audio.
 
-### 7 : WASAPI + zoom (required Special K)
+### 7 : WASAPI + zoom (Please eable Special K before starting Infinitas)
 Launch the game with WASAPI. It also runs infzoom.exe which is same as #5.
 
 Use [Special K](https://github.com/SpecialKO) to launch the game in a borderless window at 120FPS.
 
-Please disable Special K before starting Infinitas.
-After a splash screen is displayed, please enable special K and set to 120FPS and borderless window.
-After the setting is changed, infzoom will be available.
+Please eable Special K before starting Infinitas.
 
-### 8 : ASIO + zoom (required Special K)
+### 8 : ASIO + zoom (Please eable Special K before starting Infinitas)
 
 Same as #7, but with ASIO audio.
 

@@ -21,9 +21,9 @@ if ($ScriptIsUsta) {
 $InfRegistry = "HKLM:\SOFTWARE\KONAMI\beatmania IIDX INFINITAS"
 
 # Path of the game itself Usually obtained from the registry
-#$InfPath = "C:\Games\beatmania IIDX INFINITAS\"
 $InfPath = Get-ItemPropertyValue -LiteralPath $InfRegistry -Name "InstallDir"
 $InfExe = Join-Path $InfPath "\game\app\bm2dx.exe"
+$InfDir = Join-Path $InfPath "\game\app\"
 $InfLauncher = Join-Path $InfPath "\launcher\modules\bm2dx_launcher.exe"
 cd $InfPath | Out-Null
 
@@ -41,8 +41,8 @@ $ConfigJson = Join-Path $PSScriptRoot "config.json"
 
 $Config = [ordered]@{
     "Option"="0"
-    "WindowWidth"="1280"
-    "WindowHeight"="720"
+    "WindowWidth"="1920"
+    "WindowHeight"="1080"
     "WindowPositionX"="0"
     "WindowPositionY"="0"
     "Borderless"=$false
@@ -127,6 +127,12 @@ function Start-Exe($exe, $workDir, $arg){
     $p.StartInfo = $info
 
     $p.Start() | Out-Null
+
+    while ($p.MainWindowHandle -eq 0)
+    {
+        Start-Sleep -Milliseconds 100
+    }
+
     return $p
 }
 
@@ -247,8 +253,8 @@ echo "3 : ASIO"
 echo "4 : ASIO + window mode (60Hz only)"
 echo "5 : WASAPI + fullscreen borderless (60Hz only) with zoom"
 echo "6 : ASIO + fullscreen borderless (60Hz only) with zoom"
-echo "7 : WASAPI + zoom (required Special K)"
-echo "8 : ASIO + zoom (required Special K)"
+echo "7 : WASAPI + zoom (Please eable Special K before starting Infinitas)"
+echo "8 : ASIO + zoom (Please eable Special K before starting Infinitas)"
 
 $num = Read-Host "number (press enter for option $($Config["Option"]))"
 if([string]::IsNullOrEmpty($num)){
@@ -266,21 +272,21 @@ switch ($num) {
 
     }
     2 {
-        $InfArgs += " -w"
+        $InfArgs += " --fitW"
     }
     3 {
         $InfArgs += " --asio"
     }
     4 {
-        $InfArgs += " -w"
+        $InfArgs += " --fitW"
         $InfArgs += " --asio"
     }
     5 {
-        $InfArgs += " -w"
+        $InfArgs += " --fitW"
         $WithZoom = $true
     }
     6 {
-        $InfArgs += " -w"
+        $InfArgs += " --fitW"
         $InfArgs += " --asio"
         $WithZoom = $true
     }
@@ -306,34 +312,22 @@ if ($ScriptIsUsta) {
 $Config["Option"] = [string]$num
 Save-Config
 
-# wait start INFINITAS
-if ($RequiredSpecialK) { 
-    echo 'Please disable Special K before starting Infinitas.'
-    echo 'After a splash screen is displayed, please enable Special K and set windowmode borderless.'
-    echo "Press any key to start Infinitas."
-    while($true){
-        if([Console]::KeyAvailable){
-            [Console]::ReadKey($true) >$null
-            break
-        }
-        Start-Sleep 1
-    }
-}
-
 # start INFINITAS
-$p = Start-Exe $InfExe "" $InfArgs
+echo $InfArgs
+$p = Start-Exe $InfExe $InfDir $InfArgs
 
 if ($WithZoom) {
     # wait for window creation
     $p.WaitForInputIdle() | Out-Null
     $handle = $p.MainWindowHandle
+    echo $handle
 
     # we let the separate EXE handle everything for this mode
     $InfZoomExe = Join-Path $PSScriptRoot "infzoom.exe"
     $infzoom_p = Start-Exe $InfZoomExe $PSScriptRoot $handle
     $infzoom_p.WaitForExit() | Out-Null
     Pause
-} elseif ($InfArgs.Contains("-w")){
+} elseif ($InfArgs.Contains("--fitW")){
     # wait for window creation
     $p.WaitForInputIdle() | Out-Null
     $handle = $p.MainWindowHandle
@@ -351,7 +345,7 @@ if ($WithZoom) {
     echo ""
     echo "window mode setting"
     echo "example:"
-    echo "  window size -> type 1280x720"
+    echo "  window size -> type 1920x1080"
     echo "  window position -> type 100,100"
     echo "Press enter key to switch to Borderless window, or use mouse cursor to resize window"
 
