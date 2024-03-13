@@ -313,14 +313,12 @@ $Config["Option"] = [string]$num
 Save-Config
 
 # start INFINITAS
-echo $InfArgs
 $p = Start-Exe $InfExe $InfDir $InfArgs
 
 if ($WithZoom) {
     # wait for window creation
     $p.WaitForInputIdle() | Out-Null
     $handle = $p.MainWindowHandle
-    echo $handle
 
     # we let the separate EXE handle everything for this mode
     $InfZoomExe = Join-Path $PSScriptRoot "infzoom.exe"
